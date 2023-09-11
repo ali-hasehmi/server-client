@@ -128,6 +128,7 @@ int main(int argc, char *argv[]) {
 				perror("fopen"); 
 				exit(1);
 		}
+		int total_send=0;
 		while(remaining){
 			int sending_size;
 			if(remaining >= 1024){
@@ -144,7 +145,8 @@ int main(int argc, char *argv[]) {
 			if(sendall(client_socket,buff,&sending_size)){
 					printf("Problem in sending Data!\n");
 			}
-			printf("%d bytes sent!\n",sending_size);
+			total_send += sending_size;
+			printf("%d bytes sent - total sent: %d\n",sending_size,total_send);
 			
 		}
 		fclose(fp);
