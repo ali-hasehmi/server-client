@@ -26,6 +26,23 @@ long fsize(char file_name[]){
 		return file_size;
 }
 
+int sendall(int socket,char *buff,size_t len){
+		int total = 0; // how many bytes we've sent
+		int bytesleft = len; // how many bytes we have left to send
+		int bytessend;
+		while(total < len){
+				bytessend= send(socket,buff+total,bytesleft,0);
+				if(bytessend== -1){
+						perror("sendall - send");
+						return -1;
+					}
+		total += bytessend;
+		bytesleft -= bytessend;
+		}
+		return 0;
+
+}
+
 int GetString(char *buff,size_t size){
 		int index = 0;
 		char input;
@@ -120,8 +137,8 @@ int main(int argc, char *argv[]) {
 			if (fread(buff,sending_size,1,fp)!=1){
 					printf("Not haveing equal sizes in fread!\n");
 			}
-			if(send(client_socket,buff,sending_size,0) != sending_size){
-					printf("NOt having equal sizes in send!\n");
+			if(sendall(client_socket,buff,sending_size)){
+					printf("Problem in sending Data!\n");
 			}
 			
 		}

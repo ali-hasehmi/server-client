@@ -72,26 +72,26 @@ int main(int argc, char *argv) {
 		buffer[status] = '\0';
 		char file_path[30];
 		long file_size;
-		printf("msg = %s",buffer);
-		sscanf(buffer,"transfer-file --name %s --size %ld\n",file_path,&file_size);
+		printf("msg = %s\n",buffer);
+		sscanf(buffer,"transfer-file --name %s --size %ld",file_path,&file_size);
 		char new_file[45] = "server-";
 		strcat(new_file,file_path);
 		FILE *fp = fopen(new_file, "w");		
-		long remaining = file_size;
-		while(remaining){
-				int receiving_size;
+		long remaining = file_size,
+			 expected_recv,
+			 real_recv;
+		while(remaining>0){
 				if(remaining >= 1024){
-						receiving_size = 1024;
-						remaining -= 1024;
+						expected_recv= 1024;
 				}
 				else{
-						receiving_size = remaining;
-						remaining = 0;
+						expected_recv = remaining;
 				}
-				if(recv(new_socket,buffer,1024,0) != 1024){
+				if((real_recv=recv(new_socket,buffer,1024,0)) != expected_recv){
 						printf("Not having equal sizes in recv!\n");
 				}
-				if(fwrite(buffer,receiving_size,1,fp) != 1){
+				remaining -= real_recv;
+				if(fwrite(buffer,real_recv,1,fp) != 1){
 						printf("Not having equal sizes in fwrite!\n");
 				}
 		}
