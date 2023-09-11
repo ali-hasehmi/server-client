@@ -96,7 +96,8 @@ int main(int argc, char *argv) {
 						printf("disconnect from client!\n");
 						break;
 				}
-				printf("%d bytes recieved - total = %d\n",real_recv,total_recv);
+
+				printf("%ld bytes recieved - total = %ld\n",real_recv,total_recv);
 				total -= real_recv;
 				if(fwrite(buffer,real_recv,1,fp) != 1){
 						printf("Not having equal sizes in fwrite!\n");
