@@ -26,22 +26,26 @@ long fsize(char file_name[]){
 		return file_size;
 }
 
-int sendall(int socket,char *buff,size_t len){
-		int total = 0; // how many bytes we've sent
-		int bytesleft = len; // how many bytes we have left to send
-		int bytessend;
-		while(total < len){
-				bytessend= send(socket,buff+total,bytesleft,0);
-				if(bytessend== -1){
-						perror("sendall - send");
-						return -1;
-					}
-		total += bytessend;
-		bytesleft -= bytessend;
-		}
-		return 0;
+int sendall(int s, char *buf, int *len)
+{
+    int total = 0;        // how many bytes we've sent
+    int bytesleft = *len; // how many we have left to send
+    int n;
 
-}
+    while(total < *len) {
+        n = send(s, buf+total, bytesleft, 0);
+        if (n == -1) { break; }
+		if(bytesleft != n){
+				printf("need Resending Data - expected = %d ,send = %d",bytesleft,n);
+		}
+        total += n;
+        bytesleft -= n;
+    }
+
+    *len = total; // return number actually sent here
+
+    return n==-1?-1:0; // return -1 on failure, 0 on success
+} 
 
 int GetString(char *buff,size_t size){
 		int index = 0;
@@ -137,9 +141,10 @@ int main(int argc, char *argv[]) {
 			if (fread(buff,sending_size,1,fp)!=1){
 					printf("Not haveing equal sizes in fread!\n");
 			}
-			if(sendall(client_socket,buff,sending_size)){
+			if(sendall(client_socket,buff,&sending_size)){
 					printf("Problem in sending Data!\n");
 			}
+			printf("%d bytes sent!\n",sending_size);
 			
 		}
 		fclose(fp);

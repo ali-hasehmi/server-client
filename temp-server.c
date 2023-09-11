@@ -77,20 +77,27 @@ int main(int argc, char *argv) {
 		char new_file[45] = "server-";
 		strcat(new_file,file_path);
 		FILE *fp = fopen(new_file, "w");		
-		long remaining = file_size,
+		long total= file_size,
 			 expected_recv,
-			 real_recv;
-		while(remaining>0){
-				if(remaining >= 1024){
+			 real_recv,
+			 total_recv = 0;
+		while(total>0){
+				if(total>= 1024){
 						expected_recv= 1024;
 				}
 				else{
-						expected_recv = remaining;
+						expected_recv = total;
 				}
 				if((real_recv=recv(new_socket,buffer,1024,0)) != expected_recv){
 						printf("Not having equal sizes in recv!\n");
 				}
-				remaining -= real_recv;
+				total_recv += real_recv;
+				if(real_recv == 0 ){
+						printf("disconnect from client!\n");
+						break;
+				}
+				printf("%d bytes recieved - total = %d\n",real_recv,total_recv);
+				total -= real_recv;
 				if(fwrite(buffer,real_recv,1,fp) != 1){
 						printf("Not having equal sizes in fwrite!\n");
 				}
