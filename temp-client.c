@@ -8,12 +8,31 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+
+long fsize(char file_name[]){
+		FILE *fp = fopen(file_name,"r");
+		if(fp == NULL){
+				perror("fsize() - fopen");
+				return -1; 
+		}
+		fseek(fp,0L,SEEK_END);
+		long file_size = ftell(fp);
+		if(file_size == -1){
+				perror("fsize() - ftell");
+				fclose(fp);
+				return -1;
+		}
+		fclose(fp);
+		return file_size;
+}
+
 int GetString(char *buff,size_t size){
 		int index = 0;
 		char input;
-		while((input = getchar()) != '\n' && input != '\r'){
-				buff[index++]= input ;
-				if(index == size){
+		while(((input = getchar()) != '\n') && input != '\r'){
+				buff[index++]= input;
+				if(index+1 == size){
+						buff[index] = '\0';
 						return 1;
 				}
 						
@@ -72,10 +91,41 @@ int main(int argc, char *argv[]) {
 		recieved_bytes = recv(client_socket, buff, 1024, 0);
 		buff[recieved_bytes] = '\0';
 		printf("%s\n",buff);
-		while(getchar() != 'q'){
-			GetString(buff,1024);
-			send(client_socket,buff,strlen(buff),0);			
+
+		char file_path[30];
+		printf("Path To the File: ");
+		scanf("%s",file_path);
+		//GetString(file_path,30);
+		long file_size = fsize(file_path);
+		char msg[100];
+		sprintf(msg,"transfer-file --name %s --size %ld",file_path,file_size);
+		printf("file_path = %s\nfile_size=%ld\n",file_path,file_size);
+		send(client_socket,msg,strlen(msg),0);
+		long remaining = file_size;
+		FILE *fp = fopen(file_path,"r");
+		if(fp==NULL){
+				perror("fopen"); 
+				exit(1);
 		}
+		while(remaining){
+			int sending_size;
+			if(remaining >= 1024){
+					sending_size = 1024;
+					remaining -= 1024;
+			}
+			else{
+					sending_size = remaining;
+					remaining = 0; 
+			}
+			if (fread(buff,sending_size,1,fp)!=1){
+					printf("Not haveing equal sizes in fread!\n");
+			}
+			if(send(client_socket,buff,sending_size,0) != sending_size){
+					printf("NOt having equal sizes in send!\n");
+			}
+			
+		}
+		fclose(fp);
 
 		return EXIT_SUCCESS;
 }

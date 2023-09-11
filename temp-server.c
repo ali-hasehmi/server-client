@@ -68,11 +68,36 @@ int main(int argc, char *argv) {
 				perror("send");
 		}
 		len = 1024;
-		while( (status = recv(new_socket,buffer,len,0)) > 0) {
-				buffer[status]='\0';
-				printf("%s\n",buffer);
+		status = recv(new_socket,buffer,len,0);
+		buffer[status] = '\0';
+		char file_path[30];
+		long file_size;
+		printf("msg = %s",buffer);
+		sscanf(buffer,"transfer-file --name %s --size %ld\n",file_path,&file_size);
+		char new_file[45] = "server-";
+		strcat(new_file,file_path);
+		FILE *fp = fopen(new_file, "w");		
+		long remaining = file_size;
+		while(remaining){
+				int receiving_size;
+				if(remaining >= 1024){
+						receiving_size = 1024;
+						remaining -= 1024;
+				}
+				else{
+						receiving_size = remaining;
+						remaining = 0;
+				}
+				if(recv(new_socket,buffer,1024,0) != 1024){
+						printf("Not having equal sizes in recv!\n");
+				}
+				if(fwrite(buffer,receiving_size,1,fp) != 1){
+						printf("Not having equal sizes in fwrite!\n");
+				}
 		}
-
+		
+		fclose(fp);
+		
 		close(new_socket);
 		close(sfd);
 		return EXIT_SUCCESS;
