@@ -10,7 +10,7 @@
 #include <netdb.h>
 
 
-int main(int argc, char *argv) {
+int main(int argc, char *argv[]) {
 
 		int status,
 			sfd, // socket file descriptor

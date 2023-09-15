@@ -149,6 +149,9 @@ int main(int argc, char *argv[]) {
 			printf("%d bytes sent - total sent: %d\n",sending_size,total_send);
 			
 		}
+		printf("Press ENTER to continue...\n");
+		getchar();
+		getchar();
 		fclose(fp);
 
 		return EXIT_SUCCESS;
