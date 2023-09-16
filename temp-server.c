@@ -4,6 +4,7 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <time.h>
 // includes for socket programming
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -81,6 +82,7 @@ int main(int argc, char *argv[]) {
 			 expected_recv,
 			 real_recv,
 			 total_recv = 0;
+			 time_t before = time(NULL);
 		while(total>0){
 				if(total>= 1024){
 						expected_recv= 1024;
@@ -106,6 +108,8 @@ int main(int argc, char *argv[]) {
 		
 		fclose(fp);
 		
+		time_t after = time(NULL);
+		printf("recieved in %ldsec\n",after-before);
 		close(new_socket);
 		close(sfd);
 		return EXIT_SUCCESS;

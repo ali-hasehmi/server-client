@@ -4,6 +4,7 @@
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
+#include <time.h>
 //includes for socket programming
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
 				perror("fopen"); 
 				exit(1);
 		}
+		time_t before = time(NULL);
 		int total_send=0;
 		while(remaining){
 			int sending_size;
@@ -149,6 +151,8 @@ int main(int argc, char *argv[]) {
 			printf("%d bytes sent - total sent: %d\n",sending_size,total_send);
 			
 		}
+		time_t after = time(NULL);
+		printf("done in %ldsec\n",after-before);
 		printf("Press ENTER to continue...\n");
 		getchar();
 		getchar();
