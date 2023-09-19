@@ -10,6 +10,28 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+int print_bar(char *msg,long double done, long double total) {
+			if(msg == NULL) {
+					msg = "";
+			}
+			long double percentage = done/total * 100;
+			int completed_num = percentage * 30 / 100 ; // on scale of 30
+			printf("\r%s[",msg);
+			for(int i = 0 ; i < 30 ; ++i) {
+					if(completed_num){
+							putchar('#');
+							completed_num--;
+					}
+					else{
+							putchar('.');
+					}
+			}
+			printf("] %.2Lf%%",percentage);
+			if(percentage == 100.0 ) {
+				printf("\n");
+			}
+			fflush(stdout);
+	}
 
 int main(int argc, char *argv[]) {
 
@@ -99,7 +121,8 @@ int main(int argc, char *argv[]) {
 						break;
 				}
 
-				printf("%ld bytes recieved - total = %ld\n",real_recv,total_recv);
+				print_bar(new_file,total_recv,file_size);
+			//	printf("%ld bytes recieved - total = %ld\n",real_recv,total_recv);
 				total -= real_recv;
 				if(fwrite(buffer,real_recv,1,fp) != 1){
 						printf("Not having equal sizes in fwrite!\n");

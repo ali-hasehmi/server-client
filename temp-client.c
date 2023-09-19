@@ -9,6 +9,29 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+	
+	int print_bar(char *msg,long double done, long double total) {
+			if(msg == NULL) {
+					msg = "";
+			}
+			long double percentage = done/total * 100;
+			int completed_num = percentage * 30 / 100 ; // on scale of 30
+			printf("\r%s[",msg);
+			for(int i = 0 ; i < 30 ; ++i) {
+					if(completed_num){
+							putchar('#');
+							completed_num--;
+					}
+					else{
+							putchar('.');
+					}
+			}
+			printf("] %.2Lf%%",percentage);
+			if(percentage == 100.0 ) {
+				printf("\n");
+			}
+			fflush(stdout);
+	}
 
 long fsize(char file_name[]){
 		FILE *fp = fopen(file_name,"r");
@@ -148,7 +171,8 @@ int main(int argc, char *argv[]) {
 					printf("Problem in sending Data!\n");
 			}
 			total_send += sending_size;
-			printf("%d bytes sent - total sent: %d\n",sending_size,total_send);
+			print_bar(file_path,total_send,file_size);
+			//printf("%d bytes sent - total sent: %d\n",sending_size,total_send);
 			
 		}
 		time_t after = time(NULL);
