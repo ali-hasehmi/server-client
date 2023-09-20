@@ -176,6 +176,7 @@ int main(int argc, char *argv[]) {
 			
 		}
 		time_t after = time(NULL);
+		shutdown(client_socket,SHUT_WR);
 		printf("done in %ldsec\n",after-before);
 		printf("Press ENTER to continue...\n");
 		getchar();
